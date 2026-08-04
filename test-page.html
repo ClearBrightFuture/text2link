@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>sla-link 测试页</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 760px; padding: 0 1rem; background: #ffffff; color: #1f2428; }
+    section { margin: 1.75rem 0; }
+    h2 { font-size: 1.05rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+    .case { padding: .5rem .75rem; background: #f6f8fa; border-radius: 6px; margin: .5rem 0; line-height: 1.7; }
+    pre { white-space: pre-wrap; background: #0f172a; color: #e2e8f0; padding: .75rem; border-radius: 6px; }
+    textarea { width: 100%; }
+    .note { color: #57606a; font-size: .85rem; }
+    button { padding: .4rem .8rem; border: 1px solid #c9d1d9; border-radius: 6px; background: #f6f8fa; cursor: pointer; }
+    html.demo-dark body { background: #111827; color: #e5e7eb; }
+    html.demo-dark .case { background: #1f2937; }
+    html.demo-dark h2 { border-bottom-color: #374151; }
+    html.demo-dark .note { color: #9ca3af; }
+    html.demo-dark pre { background: #0b1220; }
+    html.demo-dark button { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+  </style>
+</head>
+<body>
+  <h1>文本 URL 转链接测试页</h1>
+  <p><button id="theme-toggle" type="button">切换到深色模式</button> <span class="note">切换后链接应自动换成深色配色</span></p>
+
+  <section id="basic">
+    <h2>基础转换（悬停看变色高亮，单击应新标签页打开）</h2>
+    <div class="case" id="c-inline">请访问 https://example.com 了解详情。</div>
+    <div class="case" id="c-punct-cn">详见 https://example.com/page.html。</div>
+    <div class="case" id="c-punct-en">Visit https://example.com.</div>
+    <div class="case" id="c-www">官网 www.example.com 欢迎您。</div>
+    <div class="case" id="c-upper">大写地址 HTTP://EXAMPLE.COM/INDEX</div>
+    <div class="case" id="c-query">搜索 https://example.com/search?q=hello&amp;lang=zh#top</div>
+    <div class="case" id="c-paren">维基 https://en.wikipedia.org/wiki/Example_(disambiguation)</div>
+    <div class="case" id="c-unbalanced">网址 https://example.com/foo)</div>
+    <div class="case" id="c-embedded">不要转换 myhttps://example.com 这种片段。</div>
+  </section>
+
+  <section id="more">
+    <h2>邮箱 / 电驴 / 迅雷 / 磁力</h2>
+    <div class="case" id="c-email">联系 test.user+tag@example.com 或 admin@example.com.cn。</div>
+    <div class="case" id="c-ed2k">ed2k://|file|example.mkv|123456789|ABCDEF0123456789ABCDEF0123456789ABCDEF01|/</div>
+    <div class="case" id="c-thunder">thunder://QUFodHRwOi8vZXhhbXBsZS5jb20vZmlsZS5tcDRaWg==</div>
+    <div class="case" id="c-magnet">magnet:?xt=urn:btih:0123456789abcdef0123456789abcdef01234567&amp;dn=example&amp;tr=udp://tracker.example.com:1337</div>
+    <div class="case" id="c-hash">哈希码 0123456789abcdef0123456789abcdef01234567 结束</div>
+    <div class="case" id="c-hash-neg">长串 123456789abcdef0123456789abcdef0123456789 和 foo@bar.c 和 foo@100 都不应转换</div>
+    <div class="case" id="c-url-at">https://user:pass@example.com/path</div>
+  </section>
+
+  <section id="skip">
+    <h2>不应被转换的内容</h2>
+    <div class="case" id="c-existing">
+      已有链接 <a href="https://already.example.com" id="existing-link">https://already.example.com</a> 保持原样。
+    </div>
+    <div class="case" id="c-textarea"><textarea>https://textarea-url.com</textarea></div>
+    <div class="case" id="c-editable" contenteditable="true">https://editable-url.com</div>
+    <pre id="c-pre">const u = "https://code-url.com";
+// https://comment-url.com</pre>
+    <script id="raw-script" type="text/plain">https://raw-script-url.com</script>
+    <style id="raw-style">.x{background:url(https://raw-style-url.com)}</style>
+    <p class="note">上面的 textarea、可编辑区、script/style 内部都不应出现新链接；pre 内的文字应保持一字不差。</p>
+  </section>
+
+  <section id="dynamic">
+    <h2>动态插入（约 1.2 秒后自动出现新链接）</h2>
+    <div class="case" id="c-dynamic">等待动态内容…</div>
+  </section>
+
+  <script>
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var dark = document.documentElement.classList.toggle('demo-dark');
+      this.textContent = dark ? '切换到浅色模式' : '切换到深色模式';
+    });
+    setTimeout(function () {
+      document.getElementById('c-dynamic').textContent =
+        '动态插入 https://dynamic-url.com 和邮箱 hi@dynamic-mail.com 都应被自动转换。';
+    }, 1200);
+  </script>
+</body>
+</html>
